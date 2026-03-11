@@ -773,26 +773,27 @@ async function loadData() {
 
     render(data.assets);
   } catch (e) {
-    // fallback: show placeholder demo data so the page isn't blank
-    console.warn('momentum_data.json not found — showing demo data', e);
-    const today = new Date().toISOString();
-    document.getElementById('stat-date').textContent = 'Demo mode';
+    // momentum_data.json not yet generated — show a clear "awaiting first run" message
+    console.warn('momentum_data.json not found:', e);
+    document.getElementById('stat-date').textContent = 'Awaiting run';
+    document.getElementById('stat-total').textContent = '9';
+    document.getElementById('stat-top').textContent = '—';
+    document.getElementById('stat-pos').textContent = '—';
+
     const banner = document.getElementById('update-banner');
     banner.style.display = 'flex';
-    document.getElementById('banner-text').textContent =
-      '⚠ momentum_data.json not yet generated — showing demo placeholder data';
+    banner.style.borderLeftColor = '#c87020';
+    document.getElementById('banner-text').innerHTML =
+      '⚠ <strong style="color:#f0b84a">Data not yet loaded.</strong> ' +
+      'Go to your GitHub repo → Actions → "Update Asset Momentum Data" → Run workflow. ' +
+      'After it completes, this page will show live data.';
 
-    const demo = ASSETS.map(a => ({
-      ...a,
-      r3:  a.ticker ? (Math.random() * 30 - 8) : null,
-      r6:  a.ticker ? (Math.random() * 40 - 10) : null,
-      r12: a.ticker ? (Math.random() * 60 - 15) : null,
-      score: null,
+    // Show the asset list with empty placeholders so the table structure is visible
+    const skeleton = ASSETS.map(a => ({
+      key: a.key, label: a.label, sub: a.sub, ticker: a.ticker,
+      r3: null, r6: null, r12: null, score: null,
     }));
-    demo.forEach(d => {
-      if (d.r3 !== null) d.score = (d.r3 + d.r6 + d.r12) / 3;
-    });
-    render(demo);
+    render(skeleton);
   }
 }
 
