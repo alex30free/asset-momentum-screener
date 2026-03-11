@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Allocation Momentum — StockLab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0d0e0f;
+      --surface:   #141518;
+      --border:    #232428;
+      --muted:     #3a3c42;
+      --text-dim:  #7a7d88;
+      --text:      #d4d6de;
+      --text-hi:   #f0f1f5;
+      --gold-dim:  #7a5c1e;
+      --gold:      #c8922a;
+      --gold-hi:   #f0b84a;
+      --gold-glow: rgba(200,146,42,0.15);
+      --amber:     #e8a020;
+      --green:     #4caf82;
+      --red:       #e05c5c;
+      --rank1:     #f0b84a;
+      --rank2:     #c8d4e0;
+      --rank3:     #c87b4a;
+      --radius:    6px;
+      --mono:      'DM Mono', monospace;
+      --sans:      'DM Sans', sans-serif;
+      --serif:     'DM Serif Display', serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .site-header a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 13px;
+      font-family: var(--mono);
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+    .site-header a:hover { color: var(--gold-hi); }
+    .badge {
+      background: var(--gold-dim);
+      color: var(--gold-hi);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 64px 32px 48px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .hero-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(38px, 6vw, 64px);
+      color: var(--text-hi);
+      line-height: 1.05;
+      margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold-hi);
+    }
+    .hero-sub {
+      color: var(--text-dim);
+      font-size: 15px;
+      max-width: 560px;
+      margin-bottom: 32px;
+    }
+    .hero-meta {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .meta-item {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .meta-item span {
+      color: var(--text);
+      display: block;
+      font-size: 13px;
+    }
+
+    /* ── STAT CARDS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      max-width: 960px;
+      margin: 0 auto 48px;
+      padding: 0 32px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .stat-card .label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .stat-card .value {
+      font-family: var(--mono);
+      font-size: 22px;
+      color: var(--gold-hi);
+      font-weight: 500;
+    }
+    .stat-card .sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* ── MAIN TABLE SECTION ── */
+    .section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 32px 64px;
+    }
+
+    .section-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    thead th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      background: var(--bg);
+    }
+    thead th.num { text-align: right; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(200,146,42,0.04); }
+
+    tbody td {
+      padding: 14px 16px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    tbody td.num { text-align: right; }
+
+    /* rank column */
+    .rank-cell {
+      width: 48px;
+      text-align: center;
+    }
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .rank-1 { background: rgba(240,184,74,0.18); color: var(--rank1); border: 1px solid rgba(240,184,74,0.4); }
+    .rank-2 { background: rgba(196,212,224,0.12); color: var(--rank2); border: 1px solid rgba(196,212,224,0.3); }
+    .rank-3 { background: rgba(200,123,74,0.15); color: var(--rank3); border: 1px solid rgba(200,123,74,0.3); }
+    .rank-other { color: var(--text-dim); }
+
+    /* TOP-3 row highlight */
+    tr.top-pick { background: rgba(200,146,42,0.06) !important; }
+    tr.top-pick:hover { background: rgba(200,146,42,0.10) !important; }
+
+    /* asset name */
+    .asset-name {
+      font-family: var(--sans);
+      font-weight: 500;
+      color: var(--text-hi);
+      font-size: 14px;
+    }
+    .asset-sub {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+    .ticker-pill {
+      display: inline-block;
+      background: var(--muted);
+      color: var(--text-dim);
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* return cells */
+    .ret-pos { color: var(--green); }
+    .ret-neg { color: var(--red); }
+    .ret-neutral { color: var(--text-dim); }
+
+    /* score cell */
+    .score-cell {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-hi);
+    }
+
+    /* TOP PICK badge in score col */
+    .top-pick-badge {
+      display: inline-block;
+      background: rgba(240,184,74,0.15);
+      color: var(--gold-hi);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid rgba(240,184,74,0.3);
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* loading / error */
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+    .loading-state .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FUND REFERENCE TABLE ── */
+    .funds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .fund-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      transition: border-color 0.2s;
+    }
+    .fund-card:hover { border-color: var(--gold-dim); }
+    .fund-card .fc-asset {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .fund-card .fc-name {
+      font-size: 14px;
+      color: var(--text-hi);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .fund-card .fc-meta {
+      display: flex;
+      gap: 16px;
+    }
+    .fund-card .fc-meta span {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .fund-card .fc-meta strong {
+      color: var(--text);
+    }
+
+    /* ── METHODOLOGY ── */
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .method-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+    }
+    .method-card .mc-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .method-card h3 {
+      font-size: 14px;
+      color: var(--text-hi);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .method-card p {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+    .method-formula {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 28px;
+    }
+    .method-formula strong { color: var(--gold-hi); }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 32px;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: gap;
+      gap: 16px;
+    }
+    .site-footer p {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+    .footer-links a {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold-hi); }
+
+    /* ── LAST UPDATED BANNER ── */
+    .update-banner {
+      background: linear-gradient(90deg, rgba(200,146,42,0.08), transparent);
+      border-left: 3px solid var(--gold);
+      padding: 12px 20px;
+      margin-bottom: 32px;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .update-banner .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: pulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── SCORE BAR ── */
+    .score-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .score-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--muted);
+      flex: 1;
+      min-width: 60px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--gold);
+      transition: width 0.6s ease;
+    }
+
+    @media (max-width: 600px) {
+      .hero, .section, .stats-row { padding-left: 16px; padding-right: 16px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .site-footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a href="https://alex30free.github.io/stocklab/">← StockLab Home</a>
+  <span class="badge">Screener VI</span>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Asset Allocation · Momentum Strategy VI</div>
+  <h1>Asset Class<br><em>Momentum</em></h1>
+  <p class="hero-sub">
+    Nine global asset classes ranked by composite momentum across three time horizons —
+    3, 6 and 12 months. Top 3 highlighted for allocation. Updated on the 20th of each month.
+  </p>
+  <div class="hero-meta">
+    <div class="meta-item">Universe<span>9 Asset Classes</span></div>
+    <div class="meta-item">Method<span>3M + 6M + 12M avg.</span></div>
+    <div class="meta-item">Frequency<span>Monthly · 20th</span></div>
+    <div class="meta-item">Top picks<span>3 assets</span></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="label">Assets Ranked</div>
+    <div class="value" id="stat-total">—</div>
+    <div class="sub">asset classes</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Top Score</div>
+    <div class="value" id="stat-top">—</div>
+    <div class="sub">composite avg.</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Positive Momentum</div>
+    <div class="value" id="stat-pos">—</div>
+    <div class="sub">all 3 windows green</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Last Updated</div>
+    <div class="value" id="stat-date" style="font-size:15px">—</div>
+    <div class="sub">monthly cycle</div>
+  </div>
+</div>
+
+<!-- TABLE -->
+<div class="section">
+  <div class="section-title">Momentum Rankings</div>
+
+  <div class="update-banner" id="update-banner" style="display:none">
+    <div class="dot"></div>
+    <span id="banner-text">Data loaded</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="rank-cell">Rank</th>
+          <th>Asset Class</th>
+          <th class="num">3M Return</th>
+          <th class="num">6M Return</th>
+          <th class="num">12M Return</th>
+          <th class="num">Avg. Score</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr>
+          <td colspan="7">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              Loading momentum data…
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── FUND REFERENCE ── -->
+  <div style="margin-top:56px">
+    <div class="section-title">Recommended Low-Cost Funds</div>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px">
+      Suggested index funds and ETFs for each asset class — available on Avanza and Nordnet.
+    </p>
+    <div class="funds-grid" id="funds-grid">
+      <!-- injected by JS -->
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:16px;font-family:var(--mono)">
+      * Xetra-Gold ETC (4GLD) holds physical gold. No management fee on the ETC itself; custody costs apply.
+      &nbsp;** Stop time is exchange trading hours — place orders during market open.
+    </p>
+  </div>
+
+  <!-- ── METHODOLOGY ── -->
+  <div style="margin-top:56px">
+    <div class="section-title">How It Works</div>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="mc-num">01 · SCORE</div>
+        <h3>Composite Momentum</h3>
+        <p>Each asset's price return is measured over three windows — 3, 6 and 12 months — then averaged into a single composite score. Equal-weight across all horizons.</p>
+      </div>
+      <div class="method-card">
+        <div class="mc-num">02 · RANKING</div>
+        <h3>Why Three Windows?</h3>
+        <p>Short-term (3M) catches acceleration; medium-term (6M) confirms the trend; long-term (12M) filters noise and validates structural outperformance.</p>
+      </div>
+      <div class="method-card">
+        <div class="mc-num">03 · SELECTION</div>
+        <h3>Top 3 Allocation</h3>
+        <p>The three highest-scoring asset classes are highlighted as the current month's allocation targets. Rebalance on the 20th when the new rankings publish.</p>
+      </div>
+      <div class="method-card">
+        <div class="mc-num">04 · DATA</div>
+        <h3>Source &amp; Automation</h3>
+        <p>Prices fetched via Yahoo Finance through a GitHub Actions workflow. The script runs automatically every 20th of the month and commits updated JSON data.</p>
+      </div>
+    </div>
+    <div class="method-formula">
+      <strong>Composite Score</strong> = ( Return<sub>3M</sub> + Return<sub>6M</sub> + Return<sub>12M</sub> ) ÷ 3
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid var(--border);padding:24px 32px;margin-top:32px">
+  <div style="max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+    <p style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">
+      ⚠ For informational purposes only — not financial advice.
+    </p>
+    <div style="display:flex;gap:20px">
+      <a href="https://alex30free.github.io/stocklab/" style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-decoration:none">← StockLab</a>
+      <a href="https://alex30free.github.io/swedish-rsl-screener/" style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-decoration:none">RSL</a>
+      <a href="https://alex30free.github.io/swedish-stock-screener/" style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-decoration:none">Low-Risk</a>
+      <a href="https://alex30free.github.io/swedish-compound-momentum/" style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-decoration:none">SE Momentum</a>
+      <a href="https://alex30free.github.io/german-momentum-screener/" style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-decoration:none">DE Momentum</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── FUND REFERENCE DATA ──────────────────────────────────────────
+const FUNDS = [
+  { asset: 'USA',              name: 'Storebrand USA A SEK',          fee: '0.2%', stop: '12:00 / 9:00',    etf: 'AMS:CSPX' },
+  { asset: 'Europa',           name: 'Storebrand Europa A SEK',        fee: '0.2%', stop: '12:00 / 9:00',    etf: 'AMS:IMAE' },
+  { asset: 'Japan',            name: 'Storebrand Japan A SEK',         fee: '0.2%', stop: '12:00 / 9:00',    etf: 'AMS:IJPA' },
+  { asset: 'Tillväxtmarknader',name: 'Storebrand Emerging Markets A SEK', fee: '0.4%', stop: '12:00 / 9:00', etf: 'AMS:EMIM' },
+  { asset: 'Sverige',          name: 'Storebrand Sverige A SEK',       fee: '0.2%', stop: '12:00 / 9:00',    etf: 'STO:XACT-OMXS30' },
+  { asset: 'Svenska småbolag', name: 'PLUS Småbolag Sverige Index',    fee: '0.4%', stop: '12:00 / 11:00',   etf: 'STO:XACT-SMABOLAG' },
+  { asset: 'Obligationer',     name: 'Storebrand Obligation',          fee: '0.2%', stop: '12:00 / 9:00',    etf: 'STO:XACT-Obligation' },
+  { asset: 'Korta räntor',     name: 'Storebrand Kortränta',           fee: '0.2%', stop: '12:00 / 9:00',    etf: '' },
+  { asset: 'Guld',             name: 'Xetra-Gold ETC (4GLD)*',        fee: '0.3%**', stop: 'Börshandel***', etf: 'BIT:SGLD' },
+];
+
+// ── ASSET CONFIG — tickers for Yahoo Finance ──────────────────────
+const ASSETS = [
+  { key: 'usa',     label: 'USA',               sub: 'S&P 500',                      ticker: 'CSPX.AS' },
+  { key: 'europe',  label: 'Europa',             sub: 'MSCI Europe',                  ticker: 'IMAE.AS' },
+  { key: 'japan',   label: 'Japan',              sub: 'MSCI Japan',                   ticker: 'IJPA.AS' },
+  { key: 'em',      label: 'Tillväxtmarknader',  sub: 'MSCI Emerging Markets',        ticker: 'EMIM.AS' },
+  { key: 'sweden',  label: 'Sverige',            sub: 'XACT OMXS30',                  ticker: 'XACT-OMXS30.ST' },
+  { key: 'smswe',   label: 'Svenska småbolag',   sub: 'XACT Svenska Småbolag',        ticker: 'XACT-SMABOLAG.ST' },
+  { key: 'bonds',   label: 'Obligationer',       sub: 'XACT Obligation',              ticker: 'XACT-OBLIGATION.ST' },
+  { key: 'cash',    label: 'Korta räntor',       sub: 'Riksbankens Referensränta',    ticker: null },
+  { key: 'gold',    label: 'Guld',               sub: 'Physical Gold',                ticker: 'SGLD.MI' },
+];
+
+// ── HELPERS ──────────────────────────────────────────────────────
+function fmtPct(v) {
+  if (v === null || v === undefined || isNaN(v)) return '<span class="ret-neutral">—</span>';
+  const cls = v > 0 ? 'ret-pos' : v < 0 ? 'ret-neg' : 'ret-neutral';
+  return `<span class="${cls}">${v > 0 ? '+' : ''}${v.toFixed(2)}%</span>`;
+}
+
+function fmtScore(v) {
+  if (v === null || v === undefined || isNaN(v)) return '<span class="ret-neutral">—</span>';
+  const cls = v > 0 ? 'ret-pos' : v < 0 ? 'ret-neg' : 'ret-neutral';
+  return `<span class="${cls}">${v > 0 ? '+' : ''}${v.toFixed(2)}%</span>`;
+}
+
+function rankBadge(r) {
+  if (r === 1) return `<span class="rank-badge rank-1">1</span>`;
+  if (r === 2) return `<span class="rank-badge rank-2">2</span>`;
+  if (r === 3) return `<span class="rank-badge rank-3">3</span>`;
+  return `<span class="rank-badge rank-other">${r}</span>`;
+}
+
+// ── RENDER ───────────────────────────────────────────────────────
+function render(rows) {
+  // sort by score desc (nulls last)
+  rows.sort((a, b) => {
+    if (a.score === null && b.score === null) return 0;
+    if (a.score === null) return 1;
+    if (b.score === null) return -1;
+    return b.score - a.score;
+  });
+
+  const maxScore = rows[0]?.score ?? 1;
+  let html = '';
+  let posAll3 = 0;
+
+  rows.forEach((row, i) => {
+    const rank = i + 1;
+    const isTop = rank <= 3 && row.score !== null;
+    if (isTop && row.r3 > 0 && row.r6 > 0 && row.r12 > 0) posAll3++;
+    if (!isTop && row.r3 !== null && row.r3 > 0 && row.r6 !== null && row.r6 > 0 && row.r12 !== null && row.r12 > 0) posAll3++;
+
+    const scoreBarPct = row.score !== null && maxScore !== 0
+      ? Math.max(0, Math.min(100, (row.score / maxScore) * 100)).toFixed(1)
+      : 0;
+
+    const topBadge = isTop ? `<span class="top-pick-badge">▲ Top Pick</span>` : '';
+
+    html += `
+      <tr class="${isTop ? 'top-pick' : ''}">
+        <td class="rank-cell">${rankBadge(rank)}</td>
+        <td>
+          <div class="asset-name">${row.label}</div>
+          <div class="asset-sub">${row.sub}</div>
+        </td>
+        <td class="num">${fmtPct(row.r3)}</td>
+        <td class="num">${fmtPct(row.r6)}</td>
+        <td class="num">${fmtPct(row.r12)}</td>
+        <td class="num score-cell">
+          ${fmtScore(row.score)}${topBadge}
+        </td>
+        <td>
+          <div class="score-bar-wrap" style="min-width:80px">
+            <div class="score-bar">
+              <div class="score-bar-fill" style="width:${scoreBarPct}%"></div>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+  });
+
+  document.getElementById('table-body').innerHTML = html;
+
+  // stats
+  const validRows = rows.filter(r => r.score !== null);
+  document.getElementById('stat-total').textContent = rows.length;
+  document.getElementById('stat-top').textContent = validRows[0]?.score != null
+    ? (validRows[0].score > 0 ? '+' : '') + validRows[0].score.toFixed(2) + '%' : '—';
+
+  const allPos = rows.filter(r => r.r3 !== null && r.r3 > 0 && r.r6 !== null && r.r6 > 0 && r.r12 !== null && r.r12 > 0);
+  document.getElementById('stat-pos').textContent = allPos.length;
+}
+
+// ── FUND CARDS ───────────────────────────────────────────────────
+function renderFunds() {
+  const grid = document.getElementById('funds-grid');
+  grid.innerHTML = FUNDS.map(f => `
+    <div class="fund-card">
+      <div class="fc-asset">${f.asset}</div>
+      <div class="fc-name">${f.name}</div>
+      <div class="fc-meta">
+        <span>Avgift&nbsp;<strong>${f.fee}</strong></span>
+        <span>Stopptid&nbsp;<strong>${f.stop}</strong></span>
+        ${f.etf ? `<span>ETF&nbsp;<strong>${f.etf}</strong></span>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ── LOAD DATA ────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch('momentum_data.json?v=' + Date.now());
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+
+    // update date
+    const dateStr = data.updated
+      ? new Date(data.updated).toLocaleDateString('sv-SE', { year:'numeric', month:'long', day:'numeric' })
+      : '—';
+    document.getElementById('stat-date').textContent = dateStr;
+
+    const banner = document.getElementById('update-banner');
+    banner.style.display = 'flex';
+    document.getElementById('banner-text').textContent =
+      `Data updated ${dateStr} · Next update: 20th of next month`;
+
+    render(data.assets);
+  } catch (e) {
+    // fallback: show placeholder demo data so the page isn't blank
+    console.warn('momentum_data.json not found — showing demo data', e);
+    const today = new Date().toISOString();
+    document.getElementById('stat-date').textContent = 'Demo mode';
+    const banner = document.getElementById('update-banner');
+    banner.style.display = 'flex';
+    document.getElementById('banner-text').textContent =
+      '⚠ momentum_data.json not yet generated — showing demo placeholder data';
+
+    const demo = ASSETS.map(a => ({
+      ...a,
+      r3:  a.ticker ? (Math.random() * 30 - 8) : null,
+      r6:  a.ticker ? (Math.random() * 40 - 10) : null,
+      r12: a.ticker ? (Math.random() * 60 - 15) : null,
+      score: null,
+    }));
+    demo.forEach(d => {
+      if (d.r3 !== null) d.score = (d.r3 + d.r6 + d.r12) / 3;
+    });
+    render(demo);
+  }
+}
+
+renderFunds();
+loadData();
+</script>
+</body>
+</html>
