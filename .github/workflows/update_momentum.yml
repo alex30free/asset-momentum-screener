@@ -1,0 +1,46 @@
+name: Update Asset Momentum Data
+
+on:
+  # ── Run automatically on the 20th of every month at 07:00 UTC ──
+  schedule:
+    - cron: "0 7 20 * *"
+
+  # ── Allow manual trigger from the Actions tab ──
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # needed to commit back to the repo
+
+    steps:
+      # 1. Check out the repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Python
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 3. Install dependencies
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install yfinance requests
+
+      # 4. Run the momentum fetcher
+      - name: Fetch momentum data
+        run: python fetch_momentum.py
+
+      # 5. Commit and push the updated JSON if it changed
+      - name: Commit updated momentum_data.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add momentum_data.json
+          # Only commit if the file actually changed
+          git diff --cached --quiet || git commit -m "chore: update asset momentum data [$(date -u '+%Y-%m-%d')]"
+          git push
