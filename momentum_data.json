@@ -1,0 +1,95 @@
+{
+  "updated": "2026-03-11T22:01:13.078135+00:00",
+  "assets": [
+    {
+      "key": "cash",
+      "label": "Korta räntor",
+      "sub": "Riksbankens Referensränta",
+      "ticker": null,
+      "r3": 0.5625,
+      "r6": 1.125,
+      "r12": 2.25,
+      "score": 1.3125
+    },
+    {
+      "key": "usa",
+      "label": "USA",
+      "sub": "S&P 500",
+      "ticker": "CSPX.AS",
+      "r3": null,
+      "r6": null,
+      "r12": null,
+      "score": null
+    },
+    {
+      "key": "europe",
+      "label": "Europa",
+      "sub": "MSCI Europe",
+      "ticker": "IMAE.AS",
+      "r3": null,
+      "r6": null,
+      "r12": null,
+      "score": null
+    },
+    {
+      "key": "japan",
+      "label": "Japan",
+      "sub": "MSCI Japan",
+      "ticker": "IJPA.AS",
+      "r3": null,
+      "r6": null,
+      "r12": null,
+      "score": null
+    },
+    {
+      "key": "em",
+      "label": "Tillväxtmarknader",
+      "sub": "MSCI Emerging Markets",
+      "ticker": "EMIM.AS",
+      "r3": null,
+      "r6": null,
+      "r12": null,
+      "score": null
+    },
+    {
+      "key": "sweden",
+      "label": "Sverige",
+      "sub": "XACT OMXS30",
+      "ticker": "XACT-OMXS30.ST",
+      "r3": null,
+      "r6": null,
+      "r12": null,
+      "score": null
+    },
+    {
+      "key": "smswe",
+      "label": "Svenska småbolag",
+      "sub": "XACT Svenska Småbolag",
+      "ticker": "XACT-SMABOLAG.ST",
+      "r3": null,
+      "r6": null,
+      "r12": null,
+      "score": null
+    },
+    {
+      "key": "bonds",
+      "label": "Obligationer",
+      "sub": "XACT Obligation",
+      "ticker": "XACT-OBLIGATION.ST",
+      "r3": null,
+      "r6": null,
+      "r12": null,
+      "score": null
+    },
+    {
+      "key": "gold",
+      "label": "Guld",
+      "sub": "Physical Gold",
+      "ticker": "SGLD.MI",
+      "r3": null,
+      "r6": null,
+      "r12": null,
+      "score": null
+    }
+  ]
+}
