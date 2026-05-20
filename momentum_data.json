@@ -1,75 +1,75 @@
 {
-  "updated": "2026-05-20T08:08:34.182363+00:00",
+  "updated": "2026-05-20T10:27:17.374602+00:00",
   "assets": [
     {
       "key": "em",
       "label": "Tillväxtmarknader",
       "sub": "MSCI Emerging Markets",
       "ticker": "EMIM.AS",
-      "r3": 7.312,
-      "r6": 16.312,
-      "r12": 39.348,
-      "score": 20.9907
+      "r3": 7.9663,
+      "r6": 17.0213,
+      "r12": 41.1134,
+      "score": 22.0337
     },
     {
       "key": "usa",
       "label": "USA",
       "sub": "S&P 500",
       "ticker": "CSPX.AS",
-      "r3": 10.343,
-      "r6": 8.7242,
-      "r12": 28.5171,
-      "score": 15.8614
+      "r3": 10.6028,
+      "r6": 8.9802,
+      "r12": 29.6517,
+      "score": 16.4116
     },
     {
       "key": "sweden",
       "label": "Sverige",
       "sub": "XACT OMXS30",
       "ticker": "XACT-OMXS30.ST",
-      "r3": 0.3073,
-      "r6": 12.2697,
-      "r12": 28.2048,
-      "score": 13.5939
+      "r3": 1.0095,
+      "r6": 13.0558,
+      "r12": 31.0507,
+      "score": 15.0387
     },
     {
       "key": "japan",
       "label": "Japan",
       "sub": "MSCI Japan",
       "ticker": "IJPA.AS",
-      "r3": -1.7969,
-      "r6": 11.8383,
-      "r12": 27.0143,
-      "score": 12.3519
+      "r3": -1.2919,
+      "r6": 12.4133,
+      "r12": 27.6061,
+      "score": 12.9092
     },
     {
       "key": "gold",
       "label": "Guld",
       "sub": "Physical Gold",
       "ticker": "SGLD.MI",
-      "r3": -8.6551,
-      "r6": 8.8906,
-      "r12": 31.8525,
-      "score": 10.696
+      "r3": -8.4585,
+      "r6": 9.125,
+      "r12": 29.0233,
+      "score": 9.8966
     },
     {
       "key": "europe",
       "label": "Europa",
       "sub": "MSCI Europe",
       "ticker": "IMAE.AS",
-      "r3": 0.2755,
-      "r6": 6.734,
-      "r12": 16.6133,
-      "score": 7.8743
+      "r3": 0.75,
+      "r6": 7.2391,
+      "r12": 17.5417,
+      "score": 8.5103
     },
     {
       "key": "smswe",
       "label": "Svenska småbolag",
       "sub": "XACT Svenska Småbolag",
       "ticker": "XACT-SMABOLAG.ST",
-      "r3": 0.0741,
-      "r6": 0.5397,
-      "r12": 3.5064,
-      "score": 1.3734
+      "r3": 0.7595,
+      "r6": 1.2284,
+      "r12": 5.2234,
+      "score": 2.4038
     },
     {
       "key": "cash",
@@ -86,10 +86,10 @@
       "label": "Obligationer",
       "sub": "XACT Obligation",
       "ticker": "XACT-OBLIGATION.ST",
-      "r3": -0.9624,
-      "r6": 0.3028,
-      "r12": 1.2805,
-      "score": 0.207
+      "r3": -0.7382,
+      "r6": 0.53,
+      "r12": 1.4516,
+      "score": 0.4145
     }
   ]
 }
