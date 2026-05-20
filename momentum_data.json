@@ -1,75 +1,75 @@
 {
-  "updated": "2026-04-20T09:11:54.204351+00:00",
+  "updated": "2026-05-20T08:08:34.182363+00:00",
   "assets": [
     {
       "key": "em",
       "label": "Tillväxtmarknader",
       "sub": "MSCI Emerging Markets",
       "ticker": "EMIM.AS",
-      "r3": 7.7996,
-      "r6": 17.97,
-      "r12": 49.263,
-      "score": 25.0109
-    },
-    {
-      "key": "gold",
-      "label": "Guld",
-      "sub": "Physical Gold",
-      "ticker": "SGLD.MI",
-      "r3": 3.7232,
-      "r6": 16.3748,
-      "r12": 49.7075,
-      "score": 23.2685
-    },
-    {
-      "key": "sweden",
-      "label": "Sverige",
-      "sub": "XACT OMXS30",
-      "ticker": "XACT-OMXS30.ST",
-      "r3": 6.9224,
-      "r6": 20.0102,
-      "r12": 42.8442,
-      "score": 23.2589
-    },
-    {
-      "key": "japan",
-      "label": "Japan",
-      "sub": "MSCI Japan",
-      "ticker": "IJPA.AS",
-      "r3": 4.5379,
-      "r6": 16.6962,
-      "r12": 41.8374,
-      "score": 21.0238
-    },
-    {
-      "key": "europe",
-      "label": "Europa",
-      "sub": "MSCI Europe",
-      "ticker": "IMAE.AS",
-      "r3": 2.4876,
-      "r6": 11.2769,
-      "r12": 29.3836,
-      "score": 14.3827
+      "r3": 7.312,
+      "r6": 16.312,
+      "r12": 39.348,
+      "score": 20.9907
     },
     {
       "key": "usa",
       "label": "USA",
       "sub": "S&P 500",
       "ticker": "CSPX.AS",
-      "r3": 0.8753,
-      "r6": 5.6028,
-      "r12": 29.6084,
-      "score": 12.0288
+      "r3": 10.343,
+      "r6": 8.7242,
+      "r12": 28.5171,
+      "score": 15.8614
+    },
+    {
+      "key": "sweden",
+      "label": "Sverige",
+      "sub": "XACT OMXS30",
+      "ticker": "XACT-OMXS30.ST",
+      "r3": 0.3073,
+      "r6": 12.2697,
+      "r12": 28.2048,
+      "score": 13.5939
+    },
+    {
+      "key": "japan",
+      "label": "Japan",
+      "sub": "MSCI Japan",
+      "ticker": "IJPA.AS",
+      "r3": -1.7969,
+      "r6": 11.8383,
+      "r12": 27.0143,
+      "score": 12.3519
+    },
+    {
+      "key": "gold",
+      "label": "Guld",
+      "sub": "Physical Gold",
+      "ticker": "SGLD.MI",
+      "r3": -8.6551,
+      "r6": 8.8906,
+      "r12": 31.8525,
+      "score": 10.696
+    },
+    {
+      "key": "europe",
+      "label": "Europa",
+      "sub": "MSCI Europe",
+      "ticker": "IMAE.AS",
+      "r3": 0.2755,
+      "r6": 6.734,
+      "r12": 16.6133,
+      "score": 7.8743
     },
     {
       "key": "smswe",
       "label": "Svenska småbolag",
       "sub": "XACT Svenska Småbolag",
       "ticker": "XACT-SMABOLAG.ST",
-      "r3": 2.8888,
-      "r6": 7.1726,
-      "r12": 16.9075,
-      "score": 8.9896
+      "r3": 0.0741,
+      "r6": 0.5397,
+      "r12": 3.5064,
+      "score": 1.3734
     },
     {
       "key": "cash",
@@ -86,10 +86,10 @@
       "label": "Obligationer",
       "sub": "XACT Obligation",
       "ticker": "XACT-OBLIGATION.ST",
-      "r3": 0.5577,
-      "r6": 0.71,
-      "r12": 2.2489,
-      "score": 1.1722
+      "r3": -0.9624,
+      "r6": 0.3028,
+      "r12": 1.2805,
+      "score": 0.207
     }
   ]
 }
